@@ -3,6 +3,6 @@
   "private": true,
   "scripts": {
     "build": "cd my-app && npm install && npm run build",
-    "start": "cd my-app && npx vite preview --port 10000 --host"
+    "start": "npx serve my-app/dist -l tcp://0.0.0.0:${PORT:-10000}"
   }
 }
