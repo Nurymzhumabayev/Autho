@@ -35,8 +35,8 @@ const Dashboard = ({ session, profile, onSignOut }) => {
     : '?';
 
   return (
-    <div style={styles.page}>
-      <div style={styles.leftPanel}>
+    <div className="page-container">
+      <div className="left-panel">
         <div style={styles.leftContent}>
           <div style={styles.logoWrap}>
             <HireOnIcon />
@@ -61,13 +61,13 @@ const Dashboard = ({ session, profile, onSignOut }) => {
         </div>
       </div>
 
-      <div style={styles.rightPanel}>
-        <div style={{ ...styles.card, ...styles.dashCard }} className="fade-up">
+      <div className="right-panel">
+        <div style={styles.dashCard} className="auth-card fade-up">
           <div style={styles.avatarCircle}>{initials}</div>
           <h1 style={styles.dashName}>{displayName}</h1>
           <p style={styles.dashEmail}>{session.user.email}</p>
 
-          <div style={styles.infoGrid}>
+          <div className="info-grid">
             <div style={styles.infoItem}>
               <span style={styles.infoLabel}>ID пользователя</span>
               <span style={styles.infoValue}>{session.user.id.slice(0, 8)}…</span>
@@ -181,14 +181,19 @@ const Auth = () => {
       if (error) setAuthError(translateError(error.message));
     } else {
       // --- SIGN UP ---
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: { full_name: formData.name },
         },
       });
-      if (error) setAuthError(translateError(error.message));
+      
+      if (data?.user?.identities && data.user.identities.length === 0) {
+        setAuthError('Пользователь с таким email уже существует');
+      } else if (error) {
+        setAuthError(translateError(error.message));
+      }
     }
 
     setIsSubmitting(false);
@@ -218,9 +223,9 @@ const Auth = () => {
   }
 
   return (
-    <div style={styles.page}>
+    <div className="page-container">
       {/* Left Panel */}
-      <div style={styles.leftPanel}>
+      <div className="left-panel">
         <div style={styles.leftContent}>
           <div style={styles.logoWrap}>
             <HireOnIcon />
@@ -246,9 +251,9 @@ const Auth = () => {
       </div>
 
       {/* Right Panel - Auth Form */}
-      <div style={styles.rightPanel}>
-        <div key={formKey} style={styles.card} className="fade-up">
-          <div style={styles.mobileLogo}>
+      <div className="right-panel">
+        <div key={formKey} className="auth-card fade-up">
+          <div className="mobile-logo">
             <HireOnIcon />
             <span style={styles.brandName}>Hire<b>On</b></span>
           </div>
@@ -355,8 +360,6 @@ const Auth = () => {
 };
 
 const styles = {
-  page: { display: 'flex', minHeight: '100vh', fontFamily: "'Inter', sans-serif" },
-  leftPanel: { flex: 1, background: '#111827', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem', position: 'relative', overflow: 'hidden' },
   leftContent: { maxWidth: '480px', width: '100%', zIndex: 1 },
   logoWrap: { display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '3.5rem' },
   brandName: { fontSize: '1.35rem', fontWeight: 700, letterSpacing: '-0.03em', color: '#ffffff' },
@@ -374,9 +377,7 @@ const styles = {
   mockName: { fontSize: '0.8rem', fontWeight: 600, color: '#f9fafb' },
   mockRole: { fontSize: '0.7rem', color: '#6b7280' },
   mockBadge: { marginLeft: 'auto', background: '#dcfce7', color: '#166534', fontSize: '0.7rem', fontWeight: 600, padding: '0.2rem 0.5rem', borderRadius: '4px', whiteSpace: 'nowrap' },
-  rightPanel: { width: '480px', flexShrink: 0, background: '#f9fafb', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem 2.5rem', gap: '1.25rem' },
-  card: { background: '#ffffff', borderRadius: '16px', padding: '2.5rem', width: '100%', maxWidth: '420px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08), 0 4px 10px -3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
-  mobileLogo: { display: 'none' },
+
   cardHeader: { marginBottom: '2rem' },
   cardTitle: { fontSize: '1.6rem', fontWeight: 700, color: '#111827', letterSpacing: '-0.03em', marginBottom: '0.4rem' },
   cardSub: { fontSize: '0.9rem', color: '#6b7280', lineHeight: 1.5 },
@@ -406,7 +407,7 @@ const styles = {
   avatarCircle: { width: '72px', height: '72px', borderRadius: '50%', background: '#111827', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' },
   dashName: { fontSize: '1.4rem', fontWeight: 700, color: '#111827', letterSpacing: '-0.02em', margin: 0 },
   dashEmail: { fontSize: '0.875rem', color: '#6b7280', margin: '0 0 1.25rem' },
-  infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', width: '100%', marginBottom: '1.5rem' },
+  dashEmail: { fontSize: '0.875rem', color: '#6b7280', margin: '0 0 1.25rem' },
   infoItem: { background: '#f9fafb', borderRadius: '8px', padding: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', textAlign: 'left', border: '1px solid #e5e7eb' },
   infoLabel: { fontSize: '0.7rem', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' },
   infoValue: { fontSize: '0.85rem', color: '#111827', fontWeight: 600 },
